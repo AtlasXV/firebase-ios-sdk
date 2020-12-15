@@ -79,14 +79,34 @@ NSString *const kGCSObjectAllowedCharacterSet =
 }
 
 + (NSURLRequest *)defaultRequestForPath:(FIRStoragePath *)path {
-  NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-  NSURLComponents *components = [[NSURLComponents alloc] init];
-  [components setScheme:kFIRStorageScheme];
-  [components setHost:kFIRStorageHost];
-  NSString *encodedPath = [self encodedURLForPath:path];
-  [components setPercentEncodedPath:encodedPath];
-  [request setURL:components.URL];
-  return request;
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    NSURLComponents *components = [[NSURLComponents alloc] init];
+
+    BOOL isSigned = [NSUserDefaults.standardUserDefaults boolForKey:@"customCDNIsSignedKey"];
+    BOOL shouldUseCustomCDN = [path.object rangeOfString:@".mp4"].location == NSNotFound;
+    if (isSigned && shouldUseCustomCDN) {
+        [components setScheme:@"https"];
+        [components setHost:@"res.shotcut.vidma.com"];
+
+        NSString *urlPath = [@"/" stringByAppendingString:path.object];
+        [components setPercentEncodedPath:urlPath];
+
+        NSString *cookieValue = [NSUserDefaults.standardUserDefaults stringForKey:@"customCDNCookieKey"];
+        if (cookieValue) {
+            [request setValue:cookieValue forHTTPHeaderField:@"Cookie"];
+        }
+        
+        [request setValue:@"1" forHTTPHeaderField:@"ForbiddenAuthorization"];
+    } else {
+        [components setScheme:kFIRStorageScheme];
+        [components setHost:kFIRStorageHost];
+
+        NSString *encodedPath = [self encodedURLForPath:path];
+        [components setPercentEncodedPath:encodedPath];
+    }
+
+    [request setURL:components.URL];
+    return request;
 }
 
 + (NSURLRequest *)defaultRequestForPath:(FIRStoragePath *)path

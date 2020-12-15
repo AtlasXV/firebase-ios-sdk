@@ -88,9 +88,12 @@
                                                 infoDictionary:errorDictionary];
                            [invocation setArgument:&tokenError atIndex:4];
                          } else if (token) {
-                           NSString *firebaseToken =
-                               [NSString stringWithFormat:kFIRStorageAuthTokenFormat, token];
-                           [request setValue:firebaseToken forHTTPHeaderField:@"Authorization"];
+                             BOOL forbidden = [[request valueForHTTPHeaderField:@"ForbiddenAuthorization"] isEqualToString:@"1"];
+                             if (!forbidden) {
+                                 NSString *firebaseToken =
+                                 [NSString stringWithFormat:kFIRStorageAuthTokenFormat, token];
+                                 [request setValue:firebaseToken forHTTPHeaderField:@"Authorization"];
+                             }
                          }
                          dispatch_async(callbackQueue, ^{
                            [invocation invoke];
