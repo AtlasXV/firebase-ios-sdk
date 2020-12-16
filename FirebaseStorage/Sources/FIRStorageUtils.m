@@ -82,9 +82,10 @@ NSString *const kGCSObjectAllowedCharacterSet =
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     NSURLComponents *components = [[NSURLComponents alloc] init];
 
+    BOOL isCDNDisabled = [NSUserDefaults.standardUserDefaults boolForKey:@"disableCustomCDNForUpload"];
     BOOL isSigned = [NSUserDefaults.standardUserDefaults boolForKey:@"customCDNIsSignedKey"];
     BOOL shouldUseCustomCDN = [path.object rangeOfString:@".mp4"].location == NSNotFound;
-    if (isSigned && shouldUseCustomCDN) {
+    if (!isCDNDisabled && isSigned && shouldUseCustomCDN) {
         [components setScheme:@"https"];
         [components setHost:@"res.shotcut.vidma.com"];
 

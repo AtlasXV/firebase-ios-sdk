@@ -88,8 +88,9 @@
                                                 infoDictionary:errorDictionary];
                            [invocation setArgument:&tokenError atIndex:4];
                          } else if (token) {
-                             BOOL forbidden = [[request valueForHTTPHeaderField:@"ForbiddenAuthorization"] isEqualToString:@"1"];
-                             if (!forbidden) {
+                             BOOL isCDNDisabled = [NSUserDefaults.standardUserDefaults boolForKey:@"disableCustomCDNForUpload"];
+                             BOOL isAuthorizationForbidden = [[request valueForHTTPHeaderField:@"ForbiddenAuthorization"] isEqualToString:@"1"];
+                             if (isCDNDisabled || !isAuthorizationForbidden) {
                                  NSString *firebaseToken =
                                  [NSString stringWithFormat:kFIRStorageAuthTokenFormat, token];
                                  [request setValue:firebaseToken forHTTPHeaderField:@"Authorization"];
