@@ -84,8 +84,7 @@ NSString *const kGCSObjectAllowedCharacterSet =
 
     BOOL isCDNDisabled = [NSUserDefaults.standardUserDefaults boolForKey:@"disableCustomCDNForUpload"];
     BOOL isSigned = [NSUserDefaults.standardUserDefaults boolForKey:@"customCDNIsSignedKey"];
-    BOOL shouldUseCustomCDN = [path.object rangeOfString:@".mp4"].location == NSNotFound;
-    if (!isCDNDisabled && isSigned && shouldUseCustomCDN) {
+    if (!isCDNDisabled && isSigned) {
         [components setScheme:@"https"];
         [components setHost:@"res.shotcut.vidma.com"];
 
